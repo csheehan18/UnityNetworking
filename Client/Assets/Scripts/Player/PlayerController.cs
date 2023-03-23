@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour
 	Vector2 currentMouseDelta = Vector2.zero;
 	Vector2 currentMouseDeltaVelocity = Vector2.zero;
 	private float cameraPitch = 0.0f;
-	private Vector3 oldPos;
 	private float oldRotation;
 	private bool jump;
 	private bool sprint;
@@ -29,7 +28,6 @@ public class PlayerController : MonoBehaviour
 	{
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
-		oldPos = transform.position;
 		oldRotation = transform.rotation.y;
 	}
 
@@ -69,11 +67,9 @@ public class PlayerController : MonoBehaviour
 		velocity.y += gravity * Time.deltaTime;
 		controller.Move(velocity * Time.deltaTime);
 
-		if(oldPos != transform.position)
-		{
-			oldPos = transform.position;
-			PlayerInput(x, z);
-		}
+		//Changed it to always send the input, might add a bool later on to only send it once when it stops moving to save bandwith
+		PlayerInput();
+
 
 		if ((controller.collisionFlags & CollisionFlags.Above) != 0)
 		{
@@ -125,7 +121,7 @@ public class PlayerController : MonoBehaviour
 		NetworkManager.Singleton.Client.Send(message);
 	}
 
-	public void PlayerInput(float x, float z)
+	public void PlayerInput()
 	{
 		Message message = Message.Create(MessageSendMode.Unreliable, ClientToServerId.PlayerInput);
 		message.AddFloat(x);
