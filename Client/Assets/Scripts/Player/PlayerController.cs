@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
 
 	void CheckKeys()
 	{
+
 		var isGrounded = controller.isGrounded;
 		if (isGrounded && velocity.y < 0)
 		{
@@ -67,7 +68,6 @@ public class PlayerController : MonoBehaviour
 		velocity.y += gravity * Time.deltaTime;
 		controller.Move(velocity * Time.deltaTime);
 
-		//Changed it to always send the input, might add a bool later on to only send it once when it stops moving to save bandwith
 		PlayerInput();
 
 
@@ -127,7 +127,7 @@ public class PlayerController : MonoBehaviour
 		message.AddFloat(x);
 		message.AddFloat(z);
 		message.AddBool(jump);
-		message.AddBool(sprint);
+		message.AddBool(sprint);	
 		NetworkManager.Singleton.Client.Send(message);
 	}
 
