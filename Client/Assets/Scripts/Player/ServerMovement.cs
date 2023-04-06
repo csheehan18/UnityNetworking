@@ -22,7 +22,7 @@ public class ServerMovement : MonoBehaviour
 	{
 		for(int i = 0; i < newPos.Count; i++)
 		{
-			transform.position = Vector3.Lerp(this.transform.position, newPos[i], 0.5f);
+			transform.position = Vector3.Lerp(this.transform.position, newPos[i], Vector3.Distance(transform.position, newPos[i]) / 6);
 		}
 	}
 
