@@ -34,5 +34,19 @@ public class Player : MonoBehaviour
 	{
 		Spawn(message.GetUShort(), message.GetString(), message.GetVector3());
 	}
+
+	[MessageHandler((ushort)ServerToClientId.ServerMovement)]
+	private static void PlayerMovement(Message message)
+	{
+		ushort playerId = message.GetUShort();
+		if (playerId == NetworkManager.Singleton.Client.Id)
+		{
+			return;
+		}
+		if (list.TryGetValue(playerId, out Player player))
+			player.GetComponent<ServerMovement>().Rotate(message.GetFloat());
+			player.GetComponent<ServerMovement>().Movement(message.GetVector3());
+	}
+
 }
 

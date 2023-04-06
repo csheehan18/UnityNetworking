@@ -8,6 +8,7 @@ using System;
 public enum ServerToClientId : ushort
 {
 	SpawnPlayer,
+	ServerMovement,
 
 }
 public enum ClientToServerId : ushort

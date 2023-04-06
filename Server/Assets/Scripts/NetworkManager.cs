@@ -8,6 +8,7 @@ using System;
 public enum ServerToClientId : ushort
 {
 	SpawnPlayer,
+	ServerMovement,
 }
 public enum ClientToServerId : ushort
 {
@@ -57,6 +58,8 @@ public class NetworkManager : MonoBehaviour
 		Server.ClientDisconnected += PlayerLeft;
 
 		Server.Start(port, maxClientCount);
+
+		Application.targetFrameRate = 30;
 	}
 
 	private void OnApplicationQuit()

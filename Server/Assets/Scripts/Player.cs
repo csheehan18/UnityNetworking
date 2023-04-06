@@ -44,6 +44,7 @@ public class Player : MonoBehaviour
 		return message;
 	}
 
+
 	[MessageHandler((ushort)ClientToServerId.PlayerName)]
 	private static void PlayerName(ushort fromClientId, Message message)
 	{
@@ -67,6 +68,7 @@ public class Player : MonoBehaviour
 		Player player = List[fromClientId];
 		//Now sets the varaibles from the message
 		player.GetComponent<PlayerController>().x = message.GetFloat();
+		//Issue is that z is late to the party needs to be sent at same time
 		player.GetComponent<PlayerController>().z = message.GetFloat();
 		player.GetComponent<PlayerController>().Movement(message.GetBool(), message.GetBool());
 	}

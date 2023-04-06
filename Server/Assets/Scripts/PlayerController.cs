@@ -1,3 +1,4 @@
+using Riptide;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,9 +14,16 @@ public class PlayerController : MonoBehaviour
 	//Changed the variables to be get and set by the player handler
 	public float x { get; set; }
 	public float z { get; set; }
+
+	public float yFloat { get; set; }
+	private bool doOnce;
+	private bool hasJumped;
+
+	private Vector3 oldPos;
 	void Start()
     {
         controller= GetComponent<CharacterController>();
+		oldPos = transform.position;
     }
 
 	private void Update()
@@ -35,6 +43,21 @@ public class PlayerController : MonoBehaviour
 		//Moved this below the movement and seemed to fix jumping? Idk why though
 		velocity.y += gravity * Time.deltaTime;
 		controller.Move(velocity * Time.deltaTime);
+
+		if(oldPos != transform.position)
+		{
+			oldPos= transform.position;
+			SendMovement();
+			doOnce= true;
+		}
+		else
+		{
+			if (doOnce)
+			{
+				SendMovement();
+				doOnce = false;
+			}
+		}
 	}
 
 	public void Movement(bool jump, bool sprint)
@@ -43,7 +66,9 @@ public class PlayerController : MonoBehaviour
 		{
 			velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 			controller.slopeLimit = 100.0f;
+			SendMovement();
 		}
+
 
 		if (sprint)
 		{
@@ -59,5 +84,16 @@ public class PlayerController : MonoBehaviour
 	public void PlayerRotate(float y)
 	{
 		transform.rotation = Quaternion.Euler(0f,y, 0f);
+		yFloat = y;
+		SendMovement();
+	}
+
+	private void SendMovement()
+	{
+		Message message = Message.Create(MessageSendMode.Unreliable, ServerToClientId.ServerMovement);
+		message.AddUShort(this.gameObject.GetComponent<Player>().Id);
+		message.AddFloat(yFloat);
+		message.AddVector3(this.gameObject.transform.position);
+		NetworkManager.Singleton.Server.SendToAll(message);
 	}
 }

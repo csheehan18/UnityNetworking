@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
 	private bool sprint;
 	private float x;
 	private float z;
+	private Vector3 oldPos;
+	private bool isMoving;
 
 
 	void Start()
@@ -29,6 +31,7 @@ public class PlayerController : MonoBehaviour
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 		oldRotation = transform.rotation.y;
+		oldPos = transform.position;
 	}
 
 	void Update()
@@ -48,10 +51,22 @@ public class PlayerController : MonoBehaviour
 			controller.slopeLimit = 45.0f;
 		}
 
-			x = Input.GetAxisRaw("Horizontal");
-			z = Input.GetAxisRaw("Vertical");
-			Vector3 move = transform.right * x + transform.forward * z;
-			controller.Move(move * speed * Time.deltaTime);
+		x = Input.GetAxisRaw("Horizontal");
+		z = Input.GetAxisRaw("Vertical");
+
+		if (x != 0 || z != 0)
+		{
+			isMoving= true;
+			PlayerInput();
+		}else if (isMoving)
+		{	
+			PlayerInput();
+			isMoving = false;
+		}
+
+
+		Vector3 move = transform.right * x + transform.forward * z;
+		controller.Move(move * speed * Time.deltaTime);
 
 
 		if (Input.GetButtonDown("Jump") && isGrounded)
@@ -68,12 +83,10 @@ public class PlayerController : MonoBehaviour
 		velocity.y += gravity * Time.deltaTime;
 		controller.Move(velocity * Time.deltaTime);
 
-		PlayerInput();
-
-
-		if ((controller.collisionFlags & CollisionFlags.Above) != 0)
+		
+		if(oldPos != transform.position)
 		{
-			velocity.y = -2f;
+			oldPos= transform.position;
 		}
 
 		if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.LeftShift))
@@ -108,7 +121,6 @@ public class PlayerController : MonoBehaviour
 		if(oldRotation != transform.rotation.y)
 		{
 			oldRotation = transform.rotation.y;
-			Debug.Log(transform.eulerAngles.y);
 			PlayerRotate();
 		}
 
